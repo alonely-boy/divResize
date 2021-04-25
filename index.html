@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            /* border: 1px solid black; */
+            width: 200px;
+            height: 200px;
+            border: 1px solid black;
+            resize: both;
+            display: block;
+            overflow: hidden;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">123</div>
+    <div>使用MutationObserver监听div的style属性，通过对width和height变动的监听，实现监听resize的功能</div><br>
+    <div>监听到div resize <text class="time">0</text>次</div><br>
+    <div>
+        width: 
+        <text class="width">200px</text>
+        height: 
+        <text class="height">200px</text>
+    </div>
+</body>
+<script>
+    let MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+    let element = document.querySelector('.container')
+    let timeText = document.querySelector('.time')
+    let widthText = document.querySelector('.width')
+    let heightText = document.querySelector('.height')
+    let recordOldValue = {
+        width: '0',
+        height: '0'
+    }
+    let firedNum = 0
+    let observer = new MutationObserver((mutationList) => {
+        for (let mutation of mutationList) {
+            console.log(mutation)
+        }
+        let width = getComputedStyle(element).getPropertyValue('width')
+        let height = getComputedStyle(element).getPropertyValue('height')
+        if (width === recordOldValue.width && height === recordOldValue.height) return
+        recordOldValue = {
+            width,
+            height
+        }
+
+        firedNum += 1
+        timeText.innerHTML = firedNum
+        widthText.innerHTML = recordOldValue.width
+        heightText.innerHTML = recordOldValue.height
+    })
+    observer.observe(element, { attributes: true, attributeFilter: ['style'], attributeOldValue: true })
+    /*
+        关于observe方法中options参数有已下几个选项：
+        childList：设置true，表示观察目标子节点的变化，比如添加或者删除目标子节点，不包括修改子节点以及子节点后代的变化
+        attributes：设置true，表示观察目标属性的改变
+        characterData：设置true，表示观察目标数据的改变
+        subtree：设置为true，目标以及目标的后代改变都会观察
+        attributeOldValue：如果属性为true或者省略，则相当于设置为true，表示需要记录改变前的目标属性值，设置了attributeOldValue可以省略attributes设置
+        characterDataOldValue：如果characterData为true或省略，则相当于设置为true,表示需要记录改变之前的目标数据，设置了characterDataOldValue可以省略characterData设置
+        attributeFilter：如果不是所有的属性改变都需要被观察，并且attributes设置为true或者被忽略，那么设置一个需要观察的属性本地名称（不需要命名空间）的列表
+    */
+</script>
+
+</html>
